@@ -41,6 +41,8 @@ def get_args():
     # Log config
     parser.add_argument('--log-interval', type=int, default=1000,
                         help='log interval, one log per n updates (default: 1000)')
+    parser.add_argument('--log-dir', type=str, default='log/',
+                        help='directory to save agent logs (default: log/)')
 
     # Evaluate performance
     parser.add_argument('--test_iters', type=int, default=int(1e4),
@@ -54,6 +56,8 @@ def get_args():
 
     args.save_path = os.path.join("saves", "d4pg-" + args.env_id + "-" + args.run_id)
     os.makedirs(args.save_path, exist_ok=True)
+    os.makedirs(args.log_dir, exist_ok=True)
+
 
     print(' ' * 26 + 'Options')
     for k, v in vars(args).items():

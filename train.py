@@ -30,7 +30,7 @@ def main(args):
     # Create summary writer
     writer = SummaryWriter(comment=args.env_id + '-' + args.run_id)
     # Create environment for training
-    envs = make_vec_envs(args.env_id, args.seed, args.num_processes, args.gamma, device)
+    envs = make_vec_envs(args.env_id, args.seed, args.num_processes, args.gamma, args.log_dir, device)
     # Create actor-critic and their target net
     actor_net = DDPGActor(envs.observation_space.shape[0], envs.action_space.shape[0]).to(device)
     critic_net = DDPGCritic(envs.observation_space.shape[0], envs.action_space.shape[0]).to(device)

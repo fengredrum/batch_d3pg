@@ -1,3 +1,4 @@
+import os
 import gym
 import numpy as np
 import torch
@@ -15,11 +16,11 @@ except ImportError:
     pass
 
 
-def make_env(env_id, seed, rank):
+def make_env(env_id, seed, rank, log_dir):
     def _thunk():
         env = gym.make(env_id)
         env.seed(seed + rank)
-        env = bench.Monitor(env, 'logs')
+        env = bench.Monitor(env, os.path.join(log_dir, str(rank)))
         return env
 
     return _thunk
@@ -29,10 +30,11 @@ def make_vec_envs(env_name,
                   seed,
                   num_processes,
                   gamma,
+                  log_dir,
                   device,
                   ):
     envs = [
-        make_env(env_name, seed, i)
+        make_env(env_name, seed, i, log_dir)
         for i in range(num_processes)
     ]
 
