@@ -10,7 +10,7 @@ from tqdm import tqdm
 from arguments import get_args
 from environment import make_vec_envs
 from model import DDPGActor, DDPGCritic
-from d4pg import D4PG
+from d3pg import D4PG
 from storage import ReplayBuffer
 from utils import update_linear_schedule
 
