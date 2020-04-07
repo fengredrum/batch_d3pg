@@ -2,10 +2,13 @@ import torch
 import torch.nn as nn
 import numpy as np
 
+from torch import jit
 from utils import init
 
 
-class DDPGActor(nn.Module):
+class DDPGActor(jit.ScriptModule):
+    __constants__ = ['epsilon']
+
     def __init__(self, obs_size, act_size, hidden_size_1=128, hidden_size_2=128, epsilon=0.3):
         super(DDPGActor, self).__init__()
 
@@ -24,10 +27,11 @@ class DDPGActor(nn.Module):
             nn.Tanh(),
         )
 
-    def forward(self, x, deterministic=False):
+    @jit.script_method
+    def forward(self, x):
         action = self.fc(x)
-        if not deterministic:
-            action = action + self.epsilon * torch.randn(action.size())
+        # if not deterministic:
+        action = action + self.epsilon * torch.randn(action.size(), device=action.device)
         # action = action.clamp(-1., 1.)
         return action
 
@@ -44,7 +48,7 @@ class DDPGActor(nn.Module):
         self.load_state_dict(target_net_state)
 
 
-class DDPGCritic(nn.Module):
+class DDPGCritic(jit.ScriptModule):
     def __init__(self, obs_size, act_size, hidden_size_1=128, hidden_size_2=128):
         super(DDPGCritic, self).__init__()
 
@@ -62,6 +66,7 @@ class DDPGCritic(nn.Module):
             init_(nn.Linear(hidden_size_2, 1)),
         )
 
+    @jit.script_method
     def forward(self, x, a):
         obs_out = self.obs_fc(x)
         return self.out_fc(torch.cat([obs_out, a], dim=1))

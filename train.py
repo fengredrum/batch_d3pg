@@ -10,7 +10,7 @@ from tqdm import tqdm
 from arguments import get_args
 from environment import make_vec_envs
 from model import DDPGActor, DDPGCritic
-from d3pg import D4PG
+from d3pg import D3PG
 from storage import ReplayBuffer
 from utils import update_linear_schedule
 
@@ -43,7 +43,7 @@ def main(args):
     target_critic_net.sync_param(critic_net)
 
     # Setup agent
-    agent = D4PG(
+    agent = D3PG(
         actor_net=actor_net,
         critic_net=critic_net,
         target_actor_net=target_actor_net,
@@ -51,10 +51,10 @@ def main(args):
         num_processes=args.num_processes,
         reward_steps=args.reward_steps,
         batch_size=args.batch_size,
+        device=device,
         gamma=args.gamma,
         actor_lr=args.actor_lr,
         critic_lr=args.critic_lr,
-        max_grad_norm=args.max_grad_norm,
     )
 
     # Create replay buffer

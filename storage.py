@@ -41,6 +41,7 @@ class ReplayBuffer(object):
             keys = np.random.choice(self.buffer_size - num_steps, batch_size, replace=True)
             keys += self.step
 
+        # iteratively add data
         obs_batch, action_batch, reward_batch, mask_batch = [], [], [], []
         for key in keys:
             index = [(i + 1) % self.buffer_size for i in range(key, key + num_steps + 1)]
@@ -53,6 +54,24 @@ class ReplayBuffer(object):
         action_batch = torch.cat(action_batch, dim=1)
         reward_batch = torch.cat(reward_batch, dim=1)
         mask_batch = torch.cat(mask_batch, dim=1)
+
+        # # sample all batch data at once
+        # index = None
+        # for key in keys:
+        #     if index is None:
+        #         index = (np.arange(key, key + num_steps + 1) + 0) % self.buffer_size
+        #     else:
+        #         index = np.append(index, (np.arange(key, key + num_steps + 1) + 0) % self.buffer_size)
+        #
+        # obs_batch = self.obs[index]
+        # mask_batch = self.masks[index]
+        # action_batch = self.actions[index]
+        # reward_batch = self.rewards[index]
+        #
+        # obs_batch = obs_batch.view(num_steps + 1, -1, self.obs.size(-1))
+        # action_batch = action_batch.view(num_steps + 1, -1, self.actions.size(-1))[:-1]
+        # mask_batch = mask_batch.view(num_steps + 1, -1)[1:]
+        # reward_batch = reward_batch.view(num_steps + 1, -1)[:-1]
 
         return dict(obs_batch=obs_batch,
                     action_batch=action_batch,

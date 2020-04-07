@@ -3,16 +3,16 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-class D4PG(object):
+class D3PG(object):
     def __init__(self, actor_net, critic_net,
                  target_actor_net, target_critic_net,
-                 num_processes, reward_steps, batch_size,
+                 num_processes, reward_steps, batch_size, device,
                  gamma=0.99, actor_lr=1e-3, critic_lr=1e-3, max_grad_norm=None):
         self.gamma = gamma
         self.T = reward_steps
         self.B = batch_size * num_processes
         self.max_grad_norm = max_grad_norm
-        self.targets = torch.zeros(self.T + 1, self.B)
+        self.targets = torch.zeros(self.T + 1, self.B, device=device)
 
         self.actor_net = actor_net
         self.critic_net = critic_net

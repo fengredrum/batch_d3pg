@@ -15,10 +15,10 @@ def get_args():
     parser.add_argument("--disable_cuda", default=False, help='Disable CUDA')
 
     # Training config
-    parser.add_argument('--num-env-steps', type=int, default=10e6,
+    parser.add_argument('--num-env-steps', type=int, default=5e6,
                         help='number of environment steps to train (default: 10e6)')
-    parser.add_argument('--actor-lr', type=float, default=3e-4,
-                        help='actor learning rate (default: 3e-4)')
+    parser.add_argument('--actor-lr', type=float, default=1e-3,
+                        help='actor learning rate (default: 1e-3)')
     parser.add_argument('--critic-lr', type=float, default=1e-3,
                         help='critic learning rate (default: 1e-3)')
     parser.add_argument('--use-linear-lr-decay', type=bool, default=True,
