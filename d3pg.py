@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 
-class D3PG(object):
+class D3PG:
     def __init__(self, actor_net, critic_net,
                  target_actor_net, target_critic_net,
                  num_processes, reward_steps, batch_size, device,
