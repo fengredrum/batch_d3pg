@@ -126,6 +126,7 @@ dmypy.json
 .idea/
 runs/
 saves/
+monitor_log/
 log/
 .DS_Store
 test.py

@@ -2,11 +2,10 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-from torch import jit
 from utils import init
 
 
-class DDPGActor(jit.ScriptModule):
+class DDPGActor(nn.Module):
     __constants__ = ['epsilon']
 
     def __init__(self, obs_size, act_size, hidden_size_1=128, hidden_size_2=128, epsilon=0.3):
@@ -19,20 +18,19 @@ class DDPGActor(jit.ScriptModule):
                                constant_(x, 0), np.sqrt(2))
 
         self.fc = nn.Sequential(
-            init_(nn.Linear(obs_size, hidden_size_1)),
-            nn.ReLU(),
-            init_(nn.Linear(hidden_size_1, hidden_size_2)),
-            nn.ReLU(),
-            init_(nn.Linear(hidden_size_2, act_size)),
+            nn.Linear(obs_size, hidden_size_1),
             nn.Tanh(),
+            nn.Linear(hidden_size_1, hidden_size_2),
+            nn.Tanh(),
+            nn.Linear(hidden_size_2, act_size),
+            # nn.Tanh(),
         )
 
-    @jit.script_method
     def forward(self, x):
         action = self.fc(x)
         # if not deterministic:
         action = action + self.epsilon * torch.randn(action.size(), device=action.device)
-        # action = action.clamp(-1., 1.)
+        action = action.clamp(-1., 1.)
         return action
 
     def sync_param(self, model):
@@ -48,7 +46,7 @@ class DDPGActor(jit.ScriptModule):
         self.load_state_dict(target_net_state)
 
 
-class DDPGCritic(jit.ScriptModule):
+class DDPGCritic(nn.Module):
     def __init__(self, obs_size, act_size, hidden_size_1=128, hidden_size_2=128):
         super(DDPGCritic, self).__init__()
 
@@ -56,17 +54,16 @@ class DDPGCritic(jit.ScriptModule):
                                constant_(x, 0), np.sqrt(2))
 
         self.obs_fc = nn.Sequential(
-            init_(nn.Linear(obs_size, hidden_size_1)),
+            nn.Linear(obs_size, hidden_size_1),
             nn.ReLU(),
         )
 
         self.out_fc = nn.Sequential(
-            init_(nn.Linear(hidden_size_1 + act_size, hidden_size_2)),
+            nn.Linear(hidden_size_1 + act_size, hidden_size_2),
             nn.ReLU(),
-            init_(nn.Linear(hidden_size_2, 1)),
+            nn.Linear(hidden_size_2, 1),
         )
 
-    @jit.script_method
     def forward(self, x, a):
         obs_out = self.obs_fc(x)
         return self.out_fc(torch.cat([obs_out, a], dim=1))

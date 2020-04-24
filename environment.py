@@ -20,6 +20,7 @@ def make_env(env_id, seed, rank, log_dir):
     def _thunk():
         env = gym.make(env_id)
         env.seed(seed + rank)
+        env = GymToFloat32(env)
         env = bench.Monitor(env, os.path.join(log_dir, str(rank)))
         return env
 
@@ -52,6 +53,25 @@ def make_vec_envs(env_name,
     envs = VecPyTorch(envs, device)
 
     return envs
+
+
+class GymToFloat32(gym.ObservationWrapper):
+
+    def __init__(self, env):
+        super(GymToFloat32, self).__init__(env)
+        old_shape = self.observation_space.shape
+        self.observation_space = gym.spaces.Box(
+            low=-1.0,
+            high=1.0,
+            shape=old_shape,
+            dtype=np.float32,
+        )
+
+    def observation(self, observation):
+        if observation.dtype != np.float32:
+            return observation.astype(np.float32)
+        else:
+            return observation
 
 
 class VecPyTorch(VecEnvWrapper):

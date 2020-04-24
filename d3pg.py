@@ -62,4 +62,7 @@ class D3PG:
         self.target_critic_net.alpha_sync_param(self.critic_net)
         self.target_actor_net.alpha_sync_param(self.actor_net)
 
-        return dict(critic_loss=critic_loss.item(), actor_loss=actor_loss.item())
+        return dict(
+            critic_loss_mean=critic_loss.item(),
+            actor_loss_mean=actor_loss.item(),
+        )

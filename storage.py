@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 
-class ReplayBuffer(object):
+class ReplayBuffer:
     def __init__(self, buffer_size, replay_initial, num_processes, obs_size, act_size):
         self.obs = torch.zeros(buffer_size, num_processes, obs_size)
         self.actions = torch.zeros(buffer_size, num_processes, act_size)
